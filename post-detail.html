@@ -131,6 +131,8 @@
             </div>`;
 
             $('#detail').html(detailTemplate);
+            $('#comments').empty();
+            showComments(data?.id);
         }
 
         const showComments = (postId) => {
@@ -160,6 +162,7 @@
                     })
 
 
+                    $('#comments').toggle();
 
                 }
             );
