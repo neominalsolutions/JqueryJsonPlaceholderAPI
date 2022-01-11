@@ -92,6 +92,8 @@
      // dropdowndan sayfa değiştiğinde kaçarlı olarak sayfalama yapacağımızı belirledik.
       const changePageSize = async (pageSize) => {
         await getPageCount(pageSize);
+        onPage(1); // sayfayı resetle
+
       }
 
       // jquery içerisinde async bir method çalıştırdık
