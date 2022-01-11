@@ -41,7 +41,9 @@
       </div>
       <div class="row">
         <!-- table içerisinde gösterelim -->
-        <div class="col" id="peoples"></div>
+        <div class="col" id="peoples">
+
+        </div>
       </div>
 
       <div class="row">
@@ -56,31 +58,81 @@
 
      var activePageIndex = 1; // aktif olan sayfa indeksi
      var paginationCount = 1;  // toplam sayfa sayısı
+     var pageSize = 2;
 
      // önceki sayfa func
-     const onPrev = () => {
+     const onPrev = async () => {
 
         // bir önceki adıma gitmek için aktif sayfa sayımızın 1 den büyük olması lazım 
         if(activePageIndex > 1){
             activePageIndex--;
             setActivePageClass();
+            await renderData();
         }
      }
 
      // Sonraki sayfa func
-     const onNext = () => {
+     const onNext = async () => {
          // bir sonraki sayfaya gidebilmek için ise aktif sayfamızın paginationCount dan küçük olması lazım
         if(activePageIndex < paginationCount){
             activePageIndex++;
             setActivePageClass();
+            await renderData();
         }
         
      }
 
+     // her bir sayfa değişiminde çağırmalıyız. onPage de çağıracağız. OnPrev OnNext ve Sayfa ilk yüklendiğinde çağırdık.
+     
+     const renderData = async () => {
+
+        let url =`https://services.odata.org/TripPinRESTierService/(S(mtvyrm2aruysvow4f3odr4ih))/People?$orderby=UserName%20asc&$skip=${(activePageIndex-1) * pageSize}&$top=${pageSize}`;
+
+       let response = await fetch(url);
+       let data = await response.json();
+
+       console.log('data', data);
+
+        let tBodyTemplate = '';
+
+        $.each(data?.value,(key,value) => {
+
+            console.log('value', value);
+
+            tBodyTemplate += `<tr>
+                    <td>${value?.FirstName} ${value?.LastName}</td>
+                    <td>${value?.UserName}</td>
+                    <td>${value.Emails}</td>
+                </tr>`
+        })
+
+
+        $('#peoples').empty();
+        $('#peoples').append(`<table class="table table-response table-bordered">
+            <thead>
+                <tr>
+                    <th>FullName</th>
+                    <th>UserName</th>
+                    <th>Emails</th>
+                </tr>
+            </thead>
+            <tbody>
+                    ${
+                        tBodyTemplate
+                    }
+            </tbody>
+            
+            </table>`)
+
+
+
+     }
+
      // aktif sayfa func
-     const onPage = (page) => {
+     const onPage  = async (page) => {
          activePageIndex = page; // aktif sayfayı set et
         setActivePageClass(); // aktif sayyfanın seçili olarak görünmesini ayarla
+        await renderData();
      }
 
      const setActivePageClass = () => {
@@ -90,15 +142,18 @@
      }
 
      // dropdowndan sayfa değiştiğinde kaçarlı olarak sayfalama yapacağımızı belirledik.
-      const changePageSize = async (pageSize) => {
+      const changePageSize = async (size) => {
+        pageSize = size;
         await getPageCount(pageSize);
         onPage(1); // sayfayı resetle
+        // sayfada gösterilecek olan kayıt sayısı değişince kaldığımız son sayfa kayıt sayısı olarak doğru olamayacağından burada ilk sayfaya geri dönüyoruz.
 
       }
 
       // jquery içerisinde async bir method çalıştırdık
       $(document).ready(async function() {
           await getPageCount(); // toplam kaç adet kayıt olacağını bulup, buna göre sayfada kaç adet sayfalama olacağını dinamik olarak hesapladık.
+          await renderData();
       });
 
       // default her sayfada 2 kayıt gösterecek şekilde çalışacak
