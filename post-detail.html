@@ -56,20 +56,43 @@ $("#postSearch").on("keyup", function() {
     const inputValue = $(this).val().toLowerCase(); // inputtaki değeri küçük harfe çevirir. 
     // Input olduğu için değer valuedan okundu JS deki value değeri
 
+    console.log('inputValue',inputValue);
     // ınputttaki valu oku
 
     // regex dışında diğer bir arama tekniği ise inputtan aranacak değer ile aranan değerin ikisini toLowerCase küçük harfe çevirip aramak.
-    console.log('input', inputValue);
 
+    // Jquery Filter ile tüm elementler içerisinde gezinip her bir elemente bir işlem yaptırabiliriz. aşağıdaki kodda posts içerisindeli li ler içersinde html element olarak dönüp her bir elemanı $(this) ile current li bulup inputValue değer ile liText eşleşme durumuna göre göster gizle yaptık.
 
-    $("#posts li").filter(function() {
+    $("#posts li").each(function(key,value) {
+
+        // console.log('liElement',value)
 
        const liText =  $(this).text().toLowerCase(); // li elementi içerisindeki text değerini çevirir.
         // html element olduğundan değer text ile okundu. Javascript textContent eşit olur. <p>deneme</p>
 
-      $(this).toggle(liText.indexOf(inputValue) > -1); // eşleşmeyenleri toggle ile gizleriz.
+        // console.log('liText',liText);
+        // console.log('result', liText.indexOf(inputValue));
+      
+        // 1. yöntem
+        // if(liText.indexOf(inputValue) == -1){
+        //     console.log('liElement', $(this))
+        //     $(this).hide();
+        // }
+        // else {
+        //     $(this).show();
+        // }
+
+ 
+        // 2. yöntem 
+        $(this).toggle(liText.indexOf(inputValue) > -1)
+   
     });
-  });
+
+
+
+  })
+
+
 
       $(document).ready(function () {
         const urlParams = new URLSearchParams(window.location.search);
